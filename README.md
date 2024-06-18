@@ -1,4 +1,4 @@
-# 🎉 Matrix Calculator - CS121 FINAL PIT 🎉
+# 🖩 Matrix Calculator - CS121 FINAL PIT 🖩
 
 Welcome to the **Matrix Calculator**! This app, developed as the final project for CS121 - Computer Progamming 2, leverages the powerful Qt 6.0 framework to provide a comprehensive suite of matrix operations. Whether you're a student, teacher, or enthusiast, this tool is designed to simplify your work with matrices. 🚀
 
