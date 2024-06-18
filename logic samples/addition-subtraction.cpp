@@ -1,107 +1,98 @@
 #include <iostream>
+#include <vector>
+
 using namespace std;
 
-// Good!
-
-int main()
-{
-    int row1, column1, row2, column2;
-    cout << "Enter size of row for first matrix (1-6):";
-    cin >> row1;
-    cout << "Enter size of column for first matrix (1-6):";
-    cin >> column1;
-    int matx1[row1][column1];
-    cout << "Enter first matrix element:";
-    for (int i = 0; i < row1; i++)
-    {
-        for (int j = 0; j < column1; j++)
-        {
-            cin >> matx1[i][j];
-        }
-    }
-    cout << "First matrix element:\n";
-    for (int i = 0; i < row1; i++)
-    {
-        for (int j = 0; j < column1; j++)
-        {
-            cout << matx1[i][j] << " ";
-        }
-        cout << "\n";
+std::vector<std::vector<double>> addMatrices(const std::vector<std::vector<double>>& matrix1, const std::vector<std::vector<double>>& matrix2) {
+    if (matrix1.size() != matrix2.size() || matrix1[0].size() != matrix2[0].size()) {
+        throw std::runtime_error("Matrices must have the same dimensions for addition.");
     }
 
-    // Second matrix
-    cout << "Enter size of row for second matrix:";
-    cin >> row2;
-    cout << "Enter size of column for second matrix:";
-    cin >> column2;
-    int matx2[row2][column2];
-    cout << "Enter second matrix element:";
-    for (int i = 0; i < row2; i++)
-    {
-        for (int j = 0; j < column2; j++)
-        {
-            cin >> matx2[i][j];
-        }
-    }
-    cout << "Second matrix element:\n";
-    for (int i = 0; i < row2; i++)
-    {
-        for (int j = 0; j < column2; j++)
-        {
-            cout << matx2[i][j] << " ";
-        }
-        cout << "\n";
+    if (matrix1.size() > 6 || matrix1[0].size() > 6 || matrix2.size() > 6 || matrix2[0].size() > 6) {
+        throw std::runtime_error("Matrix size must not exceed 6x6.");
     }
 
-    // Check if matrices are of the same size
-    if (row1 == row2 && column1 == column2)
-    {
-        int result[row1][column2];
-        char operation;
-        cout << "Enter '+' for addition or '-' for subtraction: ";
-        cin >> operation;
+    std::vector<std::vector<double>> result(matrix1.size(), std::vector<double>(matrix1[0].size()));
 
+    for (size_t i = 0; i < matrix1.size(); i++) {
+        for (size_t j = 0; j < matrix1[0].size(); j++) {
+            result[i][j] = matrix1[i][j] + matrix2[i][j];
+        }
+    }
 
-        if (operation == '+')
-        {
-            for (int i = 0; i < row1; i++)
-            {
-                for (int j = 0; j < column2; j++)
-                {
-                    result[i][j] = matx1[i][j] + matx2[i][j];
-                }
+    return result;
+}
+
+std::vector<std::vector<double>> subtractMatrices(const std::vector<std::vector<double>>& matrix1, const std::vector<std::vector<double>>& matrix2) {
+    if (matrix1.size() != matrix2.size() || matrix1[0].size() != matrix2[0].size()) {
+        throw std::runtime_error("Matrices must have the same dimensions for subtraction.");
+    }
+
+    if (matrix1.size() > 6 || matrix1[0].size() > 6 || matrix2.size() > 6 || matrix2[0].size() > 6) {
+        throw std::runtime_error("Matrix size must not exceed 6x6.");
+    }
+
+    std::vector<std::vector<double>> result(matrix1.size(), std::vector<double>(matrix1[0].size()));
+
+    for (size_t i = 0; i < matrix1.size(); i++) {
+        for (size_t j = 0; j < matrix1[0].size(); j++) {
+            result[i][j] = matrix1[i][j] - matrix2[i][j];
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    // Example 1: Adding two 2x2 matrices
+    std::vector<std::vector<double>> matrix1 = {{1, 2}, {3, 4}};
+    std::vector<std::vector<double>> matrix2 = {{5, 6}, {7, 8}};
+
+    try {
+        std::vector<std::vector<double>> result = addMatrices(matrix1, matrix2);
+        std::cout << "Addition of matrices:" << std::endl;
+        for (const auto& row : result) {
+            for (double element : row) {
+                std::cout << element << " ";
             }
-            cout << "Sum of matrices:\n";
+            std::cout << std::endl;
         }
-        else if (operation == '-')
-        {
-            for (int i = 0; i < row1; i++)
-            {
-                for (int j = 0; j < column2; j++)
-                {
-                    result[i][j] = matx1[i][j] - matx2[i][j];
-                }
-            }
-            cout << "Difference of matrices:\n";
-        }
-        else
-        {
-            cout << "Invalid operation selected.";
-            return 1; // Exit the program
-        }
-
-        for (int i = 0; i < row1; i++)
-        {
-            for (int j = 0; j < column2; j++)
-            {
-                cout << result[i][j] << " ";
-            }
-            cout << "\n";
-        }
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
     }
-    else
-    {
-        cout << "Unequal matrices and addition/subtraction is not possible";
+
+    // Example 2: Subtracting two 3x3 matrices
+    std::vector<std::vector<double>> matrix3 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    std::vector<std::vector<double>> matrix4 = {{9, 8, 7}, {6, 5, 4}, {3, 2, 1}};
+
+    try {
+        std::vector<std::vector<double>> result = subtractMatrices(matrix3, matrix4);
+        std::cout << "\nSubtraction of matrices:" << std::endl;
+        for (const auto& row : result) {
+            for (double element : row) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+        }
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    // Example 3: Trying to add matrices with different dimensions
+    std::vector<std::vector<double>> matrix5 = {{1, 2, 3}, {4, 5, 6}};
+    std::vector<std::vector<double>> matrix6 = {{7, 8}, {9, 10}, {11, 12}};
+
+    try {
+        std::vector<std::vector<double>> result = addMatrices(matrix5, matrix6);
+        std::cout << "\nAddition of matrices:" << std::endl;
+        for (const auto& row : result) {
+            for (double element : row) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+        }
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
     }
 
     return 0;

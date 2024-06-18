@@ -16,11 +16,21 @@
     <height>700</height>
    </size>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>1250</width>
+    <height>795</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>matrixCalcu</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#frame_3 {
+   <string notr="true">QMainWindow {
+	background-color: #161628;
+}
+
+#frame_3 {
 	background: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 #CEB268, stop:1 #CCA94C);
 	border-radius: 30px;
 	max-height: 500px;
@@ -30,11 +40,25 @@
 	height: 40px;
 	max-width: 150px;
 	margin: 0px 12px 0px 12px;
-	background-color: #424242;
+	background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 #424242, stop:1 #292929);
 	border-radius: 15px;
 	color: white;
 	font: bold 15px &quot;DM Sans&quot; ;
 
+}
+
+#frame_3 QPushButton::hover {
+	color: black;
+	background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 #F6A5CC, stop:1 #B02E6D);
+}
+
+#label_logo {
+	font: bold 25px &quot;DM Sans&quot;;
+	color: white;
+}
+
+#label_welcome {
+	color: white;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -81,21 +105,32 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>10</height>
+           <height>20</height>
           </size>
          </property>
         </spacer>
        </item>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="label_logo">
          <property name="maximumSize">
           <size>
-           <width>70</width>
+           <width>190</width>
            <height>70</height>
           </size>
          </property>
+         <property name="font">
+          <font>
+           <family>DM Sans</family>
+           <pointsize>-1</pointsize>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
-          <string>TextLabel</string>
+          <string>Logo</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -162,6 +197,9 @@
               <property name="text">
                <string>Addition</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -171,6 +209,9 @@
               </property>
               <property name="text">
                <string>Subtraction</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -182,6 +223,9 @@
               <property name="text">
                <string>Multiplication</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -191,6 +235,9 @@
               </property>
               <property name="text">
                <string>Transpose</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -202,6 +249,9 @@
               <property name="text">
                <string>Determinant</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -211,6 +261,9 @@
               </property>
               <property name="text">
                <string>Inverse</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -222,6 +275,9 @@
               <property name="text">
                <string>Row echelon</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -231,6 +287,9 @@
               </property>
               <property name="text">
                <string>Reduced REF</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -270,6 +329,12 @@
     </item>
     <item>
      <widget class="QFrame" name="frame_2">
+      <property name="maximumSize">
+       <size>
+        <width>830</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -280,17 +345,33 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>TextLabel</string>
+          <widget class="QStackedWidget" name="stackedWidget">
+           <property name="currentIndex">
+            <number>0</number>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
+           <widget class="QWidget" name="page">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="QLabel" name="label_welcome">
+               <property name="font">
+                <font>
+                 <family>Poppins</family>
+                 <pointsize>48</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Welcome to 
+Matrix Calculator!</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="page_2"/>
           </widget>
          </item>
         </layout>
