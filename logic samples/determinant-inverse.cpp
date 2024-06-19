@@ -52,18 +52,19 @@ vector<vector<double>> matrixMinor(const vector<vector<double>>& matrix, int row
     return minorMatrix;
 }
 
-// Function to calculate the matrix of minors
-vector<vector<double>> matrixOfMinors(const vector<vector<double>>& matrix) {
+// Function to calculate the matrix of cofactors
+vector<vector<double>> matrixOfCofactors(const vector<vector<double>>& matrix) {
     int n = matrix.size();
-    vector<vector<double>> minors(n, vector<double>(n));
+    vector<vector<double>> cofactors(n, vector<double>(n));
     
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            minors[i][j] = determinant(matrixMinor(matrix, i, j));
+            double minorDet = determinant(matrixMinor(matrix, i, j));
+            cofactors[i][j] = ((i + j) % 2 == 0 ? 1 : -1) * minorDet;
         }
     }
     
-    return minors;
+    return cofactors;
 }
 
 // Function to calculate the transpose of a matrix
@@ -90,8 +91,8 @@ vector<vector<double>> inverseMatrix(const vector<vector<double>>& matrix) {
         throw runtime_error("Inverse does not exist (determinant is zero).");
     }
     
-    vector<vector<double>> minors = matrixOfMinors(matrix);
-    vector<vector<double>> adjugate = matrixTranspose(minors);
+    vector<vector<double>> cofactors = matrixOfCofactors(matrix);
+    vector<vector<double>> adjugate = matrixTranspose(cofactors);
     
     vector<vector<double>> inverse(n, vector<double>(n));
     
