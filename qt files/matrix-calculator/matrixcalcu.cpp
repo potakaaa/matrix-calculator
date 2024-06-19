@@ -6,6 +6,8 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     , ui(new Ui::matrixCalcu)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Matrix Calculator");
 }
 
 matrixCalcu::~matrixCalcu()

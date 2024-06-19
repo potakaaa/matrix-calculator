@@ -27,7 +27,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QMainWindow {
-	background-color: #161628;
+	background-color: qlineargradient(spread:pad, x1:0.514, y1:0, x2:0.508, y2:1, stop:0 rgba(22, 22, 40, 255), stop:1 rgba(49, 50, 88, 255));
 }
 
 #frame_3 {
@@ -53,12 +53,16 @@
 }
 
 #label_logo {
-	font: bold 25px &quot;DM Sans&quot;;
+	font: bold 25px &quot;Poppins&quot;;
 	color: white;
 }
 
 #label_welcome {
 	color: white;
+}
+
+#label_clickOperation {
+	color: rgba(255, 255, 255, 0.7)
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -120,7 +124,7 @@
          </property>
          <property name="font">
           <font>
-           <family>DM Sans</family>
+           <family>Poppins</family>
            <pointsize>-1</pointsize>
            <italic>false</italic>
            <bold>true</bold>
@@ -343,26 +347,48 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
+        <widget class="QLabel" name="label_welcome">
+         <property name="font">
+          <font>
+           <family>Poppins</family>
+           <pointsize>28</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Matrix Calculator</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
-           <widget class="QWidget" name="page">
+           <widget class="QWidget" name="page_home">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
-              <widget class="QLabel" name="label_welcome">
+              <widget class="QLabel" name="label_clickOperation">
                <property name="font">
                 <font>
-                 <family>Poppins</family>
-                 <pointsize>48</pointsize>
+                 <family>DM Sans</family>
+                 <pointsize>25</pointsize>
                  <bold>true</bold>
                 </font>
                </property>
                <property name="text">
-                <string>Welcome to 
-Matrix Calculator!</string>
+                <string>Click an operation!</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -371,7 +397,82 @@ Matrix Calculator!</string>
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_2"/>
+           <widget class="QWidget" name="page_simpleOperation_1">
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <widget class="QFrame" name="frame_4">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_7">
+                <item>
+                 <spacer name="verticalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Enter Matrix A size</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_7"/>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_8"/>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Enter Matrix B size</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_5"/>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_6"/>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </widget>
          </item>
         </layout>
