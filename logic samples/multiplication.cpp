@@ -27,8 +27,8 @@ double determinant(const std::vector<std::vector<double>>& matrix) {
 
 int main() {
     // Example usage 1
-    std::vector<std::vector<double>> matrix1 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-    std::vector<std::vector<double>> matrix2 = {{9, 8, 7}, {6, 5, 4}, {3, 2, 1}};
+    std::vector<std::vector<double>> matrix1 = {{4, 7}, {2, 6}};
+    std::vector<std::vector<double>> matrix2 = {{0.6, -0.7}, {-0.2, 0.4}};
 
     std::vector<std::vector<double>> result = multiplyMatrices(matrix1, matrix2);
 
@@ -58,8 +58,8 @@ int main() {
     }
 
     // Example 3: Multiplying a 3x2*2x3
-    std::vector<std::vector<double>> matrix5 = {{1, 2}, {3, 4}, {5, 6}};
-    std::vector<std::vector<double>> matrix6 = {{7, 8, 9}, {10, 11, 12}};
+    std::vector<std::vector<double>> matrix5 = {{1, 2}, {3, 4}};
+    std::vector<std::vector<double>> matrix6 = {{-2, 1}, {1.5, -0.5}};
 
     std::vector<std::vector<double>> result3 = multiplyMatrices(matrix5, matrix6);
 
