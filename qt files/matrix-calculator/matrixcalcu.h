@@ -29,6 +29,10 @@ private:
     bool int_validator(QString text);
     bool size_validator(int num);
     void showError(const QString message);
+    bool checkMatrixEntries_ifNumeric(std::vector<QLineEdit*> lineEdit_vector);
+    std::vector<std::vector<double>> transpose(const std::vector<std::vector<double>>& matrix);
+    void populateMatrixA();
+    std::vector<std::vector<double>> extractLineEditText(std::vector<QLineEdit*> lineEdits, int rows, int cols);
 
 public slots:
     void switch_page_simpleOperation_1();
@@ -46,6 +50,9 @@ public slots:
     bool check_emptyMatrix(std::vector<QLineEdit*> lineEdit_vector);
     void resultMatrix();
     void resultMatrix_2();
+
+
+
 
 };
 #endif // MATRIXCALCU_H

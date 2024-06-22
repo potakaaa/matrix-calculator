@@ -1,11 +1,16 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+using namespace std;
 
 std::vector<std::vector<double>> multiplyMatrices(const std::vector<std::vector<double>>& matrix1, const std::vector<std::vector<double>>& matrix2) {
     int m1_rows = matrix1.size();
     int m1_cols = matrix1[0].size();
     int m2_cols = matrix2[0].size();
+
+    cout << matrix1.size() << endl;
+    cout << matrix1[0].size() << endl;
+    cout << matrix2[0].size() << endl;
 
     std::vector<std::vector<double>> result(m1_rows, std::vector<double>(m2_cols, 0.0));
 
@@ -27,6 +32,7 @@ double determinant(const std::vector<std::vector<double>>& matrix) {
 
 int main() {
     // Example usage 1
+    
     std::vector<std::vector<double>> matrix1 = {{4, 7}, {2, 6}};
     std::vector<std::vector<double>> matrix2 = {{0.6, -0.7}, {-0.2, 0.4}};
 
