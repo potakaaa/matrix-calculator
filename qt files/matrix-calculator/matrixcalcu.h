@@ -43,6 +43,7 @@ public slots:
     void updateButtonStyles();
     void clear_matrixA_2_entries();
     void remove_existingMatrix(QGridLayout* gridLayout);
+    bool check_emptyMatrix(std::vector<QLineEdit*> lineEdit_vector);
 
 };
 #endif // MATRIXCALCU_H

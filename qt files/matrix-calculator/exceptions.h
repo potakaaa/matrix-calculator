@@ -36,4 +36,10 @@ public:
         : GeneralException(message) {}
 };
 
+class InputIsEmpty : public GeneralException {
+public:
+    explicit InputIsEmpty(const QString& message) noexcept
+        : GeneralException(message) {}
+};
+
 #endif // CUSTOMEXCEPTIONS_H

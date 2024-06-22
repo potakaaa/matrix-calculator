@@ -147,6 +147,18 @@ void matrixCalcu::remove_existingMatrix(QGridLayout* gridLayout)
     }
 }
 
+bool matrixCalcu::check_emptyMatrix(std::vector<QLineEdit*> lineEdit_vector)
+{
+    bool flag = false;
+    for (int i = 0; i < lineEdit_vector.size(); i++) {
+        if (lineEdit_vector[i]->text().isEmpty()) {
+            flag = true;
+            break;
+        }
+    }
+    return flag;
+}
+
 void matrixCalcu::enter_simpleOperation_1()
 {
     // For Matrix A Entries
@@ -158,6 +170,8 @@ void matrixCalcu::enter_simpleOperation_1()
         int matrixA_rows = to_int(ui->lineEdit_matrixA_rows->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols->text());
         int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_cols->text());
         int matrixA_size = matrixA_rows*matrixA_cols;
+        ui->label_matrixA_size_entry->setText(a_rows + " x " + a_cols);
+        ui->label_matrixB_size_entry->setText(b_rows + " x " + b_cols);
 
         if (matrixA_rows > 6 || matrixA_cols > 6 || matrixB_rows > 6 || matrixB_cols > 6) {
             QString message = "Matrix size is limited to 6x6 only!";
@@ -225,7 +239,12 @@ void matrixCalcu::enter_simpleOperation_2()
     // Placeholder for matrix B size
     remove_existingMatrix(ui->gridLayout_2);
     try {
-        int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_rows->text());
+        if (check_emptyMatrix(lineEdit_matrixA)) {
+            throw InputIsEmpty("Matrix input is empty!");
+            showError("Matrix input is empty!");
+        }
+
+        int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_cols->text());
         int matrixB_size = matrixB_rows*matrixB_cols;
 
         int rowNumB = 0; int colNumB = 0; int iB = 0;
@@ -258,6 +277,9 @@ void matrixCalcu::enter_simpleOperation_2()
         qDebug() << "Caught NonNumericException:" << e.message();
         showError(e.message());
         ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
+    } catch(const InputIsEmpty e) {
+        qDebug() << "Caught InputIsEmpty:" << e.message();
+        showError(e.message());
     }
 }
 
@@ -270,6 +292,7 @@ void matrixCalcu::enter_advancedOperation_1()
         QString a_rows = ui->lineEdit_matrixA_rows_2->text(); QString a_cols = ui->lineEdit_matrixA_cols_2->text();
         int matrixA_rows = to_int(ui->lineEdit_matrixA_rows_2->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols_2->text());
         int matrixA_size = matrixA_rows*matrixA_cols;
+        ui->label_matrixA_size_entry_advanced->setText(a_rows + " x " + a_cols);
 
         if (matrixA_rows > 6 || matrixA_cols > 6) {
             QString message = "Matrix size is limited to 6x6 only!";
@@ -339,7 +362,7 @@ int matrixCalcu::to_int(QString text)
 bool matrixCalcu::int_validator(QString text)
 {
     bool flag = false;
-    QRegularExpression re("[0-9]");  // a digit (\d), zero or more times (*)
+    QRegularExpression re("[0-9]");
     QRegularExpressionMatch match = re.match(text);
     if (match.hasMatch()) {
         qDebug() << "all digits";
