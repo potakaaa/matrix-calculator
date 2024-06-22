@@ -29,7 +29,6 @@ public slots:
     void enter_simpleOperation_2();
     void enter_advancedOperation_1();
     int to_int(QString text);
-    void clear_matrixA_entries();
-    void clear_matrixB_entries();
+
 };
 #endif // MATRIXCALCU_H

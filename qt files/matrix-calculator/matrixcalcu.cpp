@@ -126,7 +126,7 @@ void matrixCalcu::enter_simpleOperation_2()
 
 void matrixCalcu::enter_advancedOperation_1()
 {
-    // For Matrix A Entries
+    // For Matrix A advanced operation Entries
     // Placeholder for matrix A size
     int matrixA_rows = to_int(ui->lineEdit_matrixA_rows_2->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols_2->text());
     int matrixA_size = matrixA_rows*matrixA_cols;
@@ -136,23 +136,23 @@ void matrixCalcu::enter_advancedOperation_1()
         lineEdit_matrixA[x] = new QLineEdit();
     }
 
-    ui->gridLayout->addWidget(ui->label_enterMatrixA_entry, 0, 0, 1, matrixA_cols);
-    ui->gridLayout->addWidget(ui->label_matrixA_size_entry, matrixA_rows+1, 0, 1, matrixA_cols);
+    ui->gridLayout_5->addWidget(ui->label_enterMatrixA_entry_advanced, 0, 0, 1, matrixA_cols);
+    ui->gridLayout_5->addWidget(ui->label_matrixA_size_entry_advanced, matrixA_rows+1, 0, 1, matrixA_cols);
 
     for (rowNumA = 1; rowNumA < matrixA_rows+1; rowNumA++) {
         for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
-            ui->gridLayout->addWidget(lineEdit_matrixA[iA], rowNumA, colNumA);
+            ui->gridLayout_5->addWidget(lineEdit_matrixA[iA], rowNumA, colNumA);
             iA++;
         }
 
     }
 
-    ui->frame_6->setStyleSheet("#frame_6 QLineEdit { border-radius: 7px; "
+    ui->frame_10->setStyleSheet("#frame_10 QLineEdit { border-radius: 7px; "
                                "max-width: 300px; min-height: 50px; "
                                "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
                                "margin: 5px 2px;}");
 
-    ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA);
+    ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA_advanced);
 }
 
 int matrixCalcu::to_int(QString text)
@@ -167,8 +167,5 @@ int matrixCalcu::to_int(QString text)
     return num;
 }
 
-void matrixCalcu::clear_matrixA_entries()
-{
 
-}
 
