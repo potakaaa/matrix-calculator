@@ -44,6 +44,8 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     connect(ui->pushButton_clear_matrixA, SIGNAL(clicked()), this, SLOT(clear_matrixA_entries()));
     connect(ui->pushButton_clear_matrixB_2, SIGNAL(clicked()), this, SLOT(clear_matrixB_entries()));
     connect(ui->pushButton_clear_matrixA_advanced, SIGNAL(clicked()), this, SLOT(clear_matrixA_2_entries()));
+    connect(ui->pushButton_enter_matrixB_2, SIGNAL(clicked()), this, SLOT(resultMatrix()));
+    connect(ui->pushButton_enter_matrixA_advanced, SIGNAL(clicked()), this, SLOT(resultMatrix_2()));
 
     buttonGroup->addButton(ui->button_addition);
     buttonGroup->addButton(ui->button_subtraction);
@@ -157,6 +159,40 @@ bool matrixCalcu::check_emptyMatrix(std::vector<QLineEdit*> lineEdit_vector)
         }
     }
     return flag;
+}
+
+void matrixCalcu::resultMatrix()
+{
+    try {
+        if (check_emptyMatrix(lineEdit_matrixB)) {
+            qDebug() << "Empty matrix error here";
+            throw InputIsEmpty("Matrix input is empty!");
+            showError("Matrix input is empty!");
+
+        } else {
+            ui->stackedWidget->setCurrentWidget(ui->page_matrixResult);
+        }
+    } catch(const InputIsEmpty e) {
+        qDebug() << "Caught InputIsEmpty:" << e.message();
+        showError(e.message());
+    }
+}
+
+void matrixCalcu::resultMatrix_2()
+{
+    try {
+        if (check_emptyMatrix(lineEdit_matrixA_2)) {
+            qDebug() << "Empty matrix error here";
+            throw InputIsEmpty("Matrix input is empty!");
+            showError("Matrix input is empty!");
+
+        } else {
+            ui->stackedWidget->setCurrentWidget(ui->page_matrixResult);
+        }
+    } catch(const InputIsEmpty e) {
+        qDebug() << "Caught InputIsEmpty:" << e.message();
+        showError(e.message());
+    }
 }
 
 void matrixCalcu::enter_simpleOperation_1()
