@@ -131,6 +131,7 @@ void matrixCalcu::enter_simpleOperation_1()
     // Placeholder for matrix A size
     try {
         QString a_rows = ui->lineEdit_matrixA_rows->text(); QString a_cols = ui->lineEdit_matrixA_cols->text();
+        QString b_rows = ui->lineEdit_matrixB_rows->text(); QString b_cols = ui->lineEdit_matrixB_cols->text();
         int matrixA_rows = to_int(ui->lineEdit_matrixA_rows->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols->text());
         int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_cols->text());
         int matrixA_size = matrixA_rows*matrixA_cols;
@@ -138,7 +139,7 @@ void matrixCalcu::enter_simpleOperation_1()
             QString message = "Matrix size is limited to 6x6 only!";
             throw SizeTooLargeException(message);
             showError(message);
-        } else if (!int_validator(a_rows) || !int_validator(a_cols)) {
+        } else if (!int_validator(a_rows) || !int_validator(a_cols) || !int_validator(b_rows) || !int_validator(b_cols)) {
             QString message = "Matrix entry is not a number!";
             throw NonNumericException(message);
             showError(message);
