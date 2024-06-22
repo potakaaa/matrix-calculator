@@ -1,6 +1,10 @@
 #include "matrixcalcu.h"
 #include "ui_matrixcalcu.h"
+#include "exceptions.h"
 #include <iostream>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QMessageBox>
 
 matrixCalcu::matrixCalcu(QWidget *parent)
     : QMainWindow(parent)
@@ -12,7 +16,10 @@ matrixCalcu::matrixCalcu(QWidget *parent)
 
     /**
 
+
+
     **/
+
 
     // Sidebar button functionalities
     connect(ui->button_addition, SIGNAL(clicked()), this, SLOT(switch_page_simpleOperation_1()));
@@ -28,6 +35,7 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     connect(ui->pushButton_enter_size, SIGNAL(clicked()), this, SLOT(enter_simpleOperation_1()));
     connect(ui->pushButton_enter_size_2, SIGNAL(clicked()), this, SLOT(enter_advancedOperation_1()));
     connect(ui->pushButton_enter_matrixA, SIGNAL(clicked()), this, SLOT(enter_simpleOperation_2()));
+
 
 
 }
@@ -67,105 +75,196 @@ void matrixCalcu::enter_simpleOperation_1()
 {
     // For Matrix A Entries
     // Placeholder for matrix A size
-    int matrixA_rows = to_int(ui->lineEdit_matrixA_rows->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols->text());
-    int matrixA_size = matrixA_rows*matrixA_cols;
-    int rowNumA = 0; int colNumA = 0; int iA = 0;
-    QLineEdit* lineEdit_matrixA[matrixA_size];
-    for (int x = 0; x < matrixA_size; x++) {
-        lineEdit_matrixA[x] = new QLineEdit();
-    }
-
-    ui->gridLayout->addWidget(ui->label_enterMatrixA_entry, 0, 0, 1, matrixA_cols);
-    ui->gridLayout->addWidget(ui->label_matrixA_size_entry, matrixA_rows+1, 0, 1, matrixA_cols);
-
-    for (rowNumA = 1; rowNumA < matrixA_rows+1; rowNumA++) {
-        for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
-            ui->gridLayout->addWidget(lineEdit_matrixA[iA], rowNumA, colNumA);
-            iA++;
+    try {
+        QString a_rows = ui->lineEdit_matrixA_rows->text(); QString a_cols = ui->lineEdit_matrixA_cols->text();
+        int matrixA_rows = to_int(ui->lineEdit_matrixA_rows->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols->text());
+        int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_cols->text());
+        int matrixA_size = matrixA_rows*matrixA_cols;
+        if (matrixA_rows > 6 || matrixA_cols > 6 || matrixB_rows > 6 || matrixB_cols > 6) {
+            QString message = "Matrix size is limited to 6x6 only!";
+            throw SizeTooLargeException(message);
+            showError(message);
+        } else if (!int_validator(a_rows) || !int_validator(a_cols)) {
+            QString message = "Matrix entry is not a number!";
+            throw NonNumericException(message);
+            showError(message);
         }
 
+        int rowNumA = 0; int colNumA = 0; int iA = 0;
+        QLineEdit* lineEdit_matrixA[matrixA_size];
+        for (int x = 0; x < matrixA_size; x++) {
+            lineEdit_matrixA[x] = new QLineEdit();
+        }
+
+        ui->gridLayout->addWidget(ui->label_enterMatrixA_entry, 0, 0, 1, matrixA_cols);
+        ui->gridLayout->addWidget(ui->label_matrixA_size_entry, matrixA_rows+1, 0, 1, matrixA_cols);
+
+        for (rowNumA = 1; rowNumA < matrixA_rows+1; rowNumA++) {
+            for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
+                ui->gridLayout->addWidget(lineEdit_matrixA[iA], rowNumA, colNumA);
+                iA++;
+            }
+
+        }
+
+        ui->frame_6->setStyleSheet("#frame_6 QLineEdit { border-radius: 7px; "
+                                   "max-width: 300px; min-height: 50px; "
+                                   "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                   "margin: 5px 2px;}");
+
+        ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA);
+
+    } catch (SizeTooLargeException e) {
+        qDebug() << "Caught SizeTooLargeException:" << e.message();
+        showError(e.message());
+        ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
+    } catch(const NonNumericException e) {
+        qDebug() << "Caught NonNumericException:" << e.message();
+        showError(e.message());
+        ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
     }
-
-    ui->frame_6->setStyleSheet("#frame_6 QLineEdit { border-radius: 7px; "
-                               "max-width: 300px; min-height: 50px; "
-                               "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
-                               "margin: 5px 2px;}");
-
-    ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA);
 }
 
 void matrixCalcu::enter_simpleOperation_2()
 {
     // For Matrix B Entries
     // Placeholder for matrix B size
-    int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_rows->text());
-    int matrixB_size = matrixB_rows*matrixB_cols;
-    int rowNumB = 0; int colNumB = 0; int iB = 0;
-    QLineEdit* lineEdit_matrixB[matrixB_size];
-    for (int x = 0; x < matrixB_size; x++) {
-        lineEdit_matrixB[x] = new QLineEdit();
-    }
+    try {
+        int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_rows->text());
+        int matrixB_size = matrixB_rows*matrixB_cols;
 
-    ui->gridLayout_2->addWidget(ui->label_enterMatrixB_entry, 0, 0, 1, matrixB_cols);
-    ui->gridLayout_2->addWidget(ui->label_matrixB_size_entry, matrixB_rows+1, 0, 1, matrixB_cols);
-
-    for (rowNumB = 1; rowNumB < matrixB_rows+1; rowNumB++) {
-        for(colNumB = 0; colNumB < matrixB_cols; colNumB++) {
-            ui->gridLayout_2->addWidget(lineEdit_matrixB[iB], rowNumB, colNumB);
-            iB++;
+        int rowNumB = 0; int colNumB = 0; int iB = 0;
+        QLineEdit* lineEdit_matrixB[matrixB_size];
+        for (int x = 0; x < matrixB_size; x++) {
+            lineEdit_matrixB[x] = new QLineEdit();
         }
 
-    }
+        ui->gridLayout_2->addWidget(ui->label_enterMatrixB_entry, 0, 0, 1, matrixB_cols);
+        ui->gridLayout_2->addWidget(ui->label_matrixB_size_entry, matrixB_rows+1, 0, 1, matrixB_cols);
 
-    ui->frame_9->setStyleSheet("#frame_9 QLineEdit { border-radius: 7px; "
-                               "max-width: 300px; min-height: 50px; "
-                               "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
-                               "margin: 5px 2px;}");
-    ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixB);
+        for (rowNumB = 1; rowNumB < matrixB_rows+1; rowNumB++) {
+            for(colNumB = 0; colNumB < matrixB_cols; colNumB++) {
+                ui->gridLayout_2->addWidget(lineEdit_matrixB[iB], rowNumB, colNumB);
+                iB++;
+            }
+
+        }
+
+        ui->frame_9->setStyleSheet("#frame_9 QLineEdit { border-radius: 7px; "
+                                   "max-width: 300px; min-height: 50px; "
+                                   "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                   "margin: 5px 2px;}");
+        ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixB);
+    } catch (SizeTooLargeException e) {
+        qDebug() << "Caught SizeTooLargeException:" << e.message();
+        showError(e.message());
+        ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
+    } catch(const NonNumericException e) {
+        qDebug() << "Caught NonNumericException:" << e.message();
+        showError(e.message());
+        ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
+    }
 }
 
 void matrixCalcu::enter_advancedOperation_1()
 {
     // For Matrix A advanced operation Entries
     // Placeholder for matrix A size
-    int matrixA_rows = to_int(ui->lineEdit_matrixA_rows_2->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols_2->text());
-    int matrixA_size = matrixA_rows*matrixA_cols;
-    int rowNumA = 0; int colNumA = 0; int iA = 0;
-    QLineEdit* lineEdit_matrixA[matrixA_size];
-    for (int x = 0; x < matrixA_size; x++) {
-        lineEdit_matrixA[x] = new QLineEdit();
-    }
+    try {
+        QString a_rows = ui->lineEdit_matrixA_rows_2->text(); QString a_cols = ui->lineEdit_matrixA_cols_2->text();
+        int matrixA_rows = to_int(ui->lineEdit_matrixA_rows_2->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols_2->text());
+        int matrixA_size = matrixA_rows*matrixA_cols;
 
-    ui->gridLayout_5->addWidget(ui->label_enterMatrixA_entry_advanced, 0, 0, 1, matrixA_cols);
-    ui->gridLayout_5->addWidget(ui->label_matrixA_size_entry_advanced, matrixA_rows+1, 0, 1, matrixA_cols);
-
-    for (rowNumA = 1; rowNumA < matrixA_rows+1; rowNumA++) {
-        for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
-            ui->gridLayout_5->addWidget(lineEdit_matrixA[iA], rowNumA, colNumA);
-            iA++;
+        if (matrixA_rows > 6 || matrixA_cols > 6) {
+            QString message = "Matrix size is limited to 6x6 only!";
+            throw SizeTooLargeException(message);
+            showError(message);
+        } else if (!int_validator(a_rows) || !int_validator(a_cols)) {
+            QString message = "Matrix entry is not a number!";
+            throw NonNumericException(message);
+            showError(message);
         }
 
+        int rowNumA = 0; int colNumA = 0; int iA = 0;
+        QLineEdit* lineEdit_matrixA_2[matrixA_size];
+        for (int x = 0; x < matrixA_size; x++) {
+            lineEdit_matrixA_2[x] = new QLineEdit();
+        }
+
+        ui->gridLayout_5->addWidget(ui->label_enterMatrixA_entry_advanced, 0, 0, 1, matrixA_cols);
+        ui->gridLayout_5->addWidget(ui->label_matrixA_size_entry_advanced, matrixA_rows+1, 0, 1, matrixA_cols);
+
+        for (rowNumA = 1; rowNumA < matrixA_rows+1; rowNumA++) {
+            for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
+                ui->gridLayout_5->addWidget(lineEdit_matrixA_2[iA], rowNumA, colNumA);
+                iA++;
+            }
+
+        }
+
+        ui->frame_10->setStyleSheet("#frame_10 QLineEdit { border-radius: 7px; "
+                                   "max-width: 300px; min-height: 50px; "
+                                   "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                   "margin: 5px 2px;}");
+
+        ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA_advanced);
+
+    } catch (SizeTooLargeException e) {
+        qDebug() << "Caught SizeTooLargeException:" << e.message();
+        showError(e.message());
+        ui->stackedWidget->setCurrentWidget(ui->page_advancedOperation_1);
+    } catch(const NonNumericException e) {
+        qDebug() << "Caught NonNumericException:" << e.message();
+        showError(e.message());
+        ui->stackedWidget->setCurrentWidget(ui->page_advancedOperation_1);
     }
-
-    ui->frame_10->setStyleSheet("#frame_10 QLineEdit { border-radius: 7px; "
-                               "max-width: 300px; min-height: 50px; "
-                               "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
-                               "margin: 5px 2px;}");
-
-    ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA_advanced);
 }
+
 
 int matrixCalcu::to_int(QString text)
 {
-    bool ok;
-    int num = text.toInt(&ok);
+    int num;
 
-    // Throw exception here
-    if (!ok) {
-        std::cout << "Bad Input!";
-    }
+    bool ok;
+    num = text.toInt(&ok);
     return num;
+
 }
+
+bool matrixCalcu::int_validator(QString text)
+{
+    bool flag = false;
+    QRegularExpression re("[0-9]");  // a digit (\d), zero or more times (*)
+    QRegularExpressionMatch match = re.match(text);
+    if (match.hasMatch()) {
+        qDebug() << "all digits";
+        flag = true;
+    } else {
+        throw NonNumericException("Input is not numeric!");
+    }
+    return flag;
+}
+
+bool matrixCalcu::size_validator(int num) {
+    bool flag = true;
+    if (num > 6) {
+        throw SizeTooLargeException("Matrix is limited to 6x6 only!");
+    }
+    return flag;
+}
+
+void matrixCalcu::showError(const QString message)
+{
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Matrix Calculator");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(message);
+    msgBox.exec();
+}
+
+
+
+
 
 
 

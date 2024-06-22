@@ -13,6 +13,7 @@ SOURCES += \
     matrixcalcu.cpp
 
 HEADERS += \
+    exceptions.h \
     matrixcalcu.h
 
 FORMS += \

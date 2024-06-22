@@ -17,6 +17,7 @@ public:
     matrixCalcu(QWidget *parent = nullptr);
     ~matrixCalcu();
 
+
 private:
     Ui::matrixCalcu *ui;
 
@@ -29,6 +30,11 @@ public slots:
     void enter_simpleOperation_2();
     void enter_advancedOperation_1();
     int to_int(QString text);
+
+    bool int_validator(QString text);
+    bool size_validator(int num);
+    void showError(const QString message);
+
 
 };
 #endif // MATRIXCALCU_H
