@@ -1,14 +1,20 @@
 #include "matrixcalcu.h"
 #include "ui_matrixcalcu.h"
 #include "exceptions.h"
-#include <iostream>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
 
+#include <vector>
+
+std::vector<QLineEdit*> lineEdit_matrixA;
+std::vector<QLineEdit*> lineEdit_matrixB;
+std::vector<QLineEdit*> lineEdit_matrixA_2;
+
 matrixCalcu::matrixCalcu(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::matrixCalcu)
+    , buttonGroup(new QButtonGroup(this))
 {
     ui->setupUi(this);
 
@@ -35,14 +41,41 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     connect(ui->pushButton_enter_size, SIGNAL(clicked()), this, SLOT(enter_simpleOperation_1()));
     connect(ui->pushButton_enter_size_2, SIGNAL(clicked()), this, SLOT(enter_advancedOperation_1()));
     connect(ui->pushButton_enter_matrixA, SIGNAL(clicked()), this, SLOT(enter_simpleOperation_2()));
+    connect(ui->pushButton_clear_matrixA, SIGNAL(clicked()), this, SLOT(clear_matrixA_entries()));
+    connect(ui->pushButton_clear_matrixB_2, SIGNAL(clicked()), this, SLOT(clear_matrixB_entries()));
+    connect(ui->pushButton_clear_matrixA_advanced, SIGNAL(clicked()), this, SLOT(clear_matrixA_2_entries()));
 
+    buttonGroup->addButton(ui->button_addition);
+    buttonGroup->addButton(ui->button_subtraction);
+    buttonGroup->addButton(ui->button_multiplication);
+    buttonGroup->addButton(ui->button_transpose);
+    buttonGroup->addButton(ui->button_determinant);
+    buttonGroup->addButton(ui->button_inverse);
+    buttonGroup->addButton(ui->button_ref);
+    buttonGroup->addButton(ui->button_rref);
 
+    // Set buttons as checkable
+    foreach(QAbstractButton *button, buttonGroup->buttons()) {
+        connect(button, &QPushButton::toggled, this, &matrixCalcu::updateButtonStyles);
+    }
+
+    updateButtonStyles();
 
 }
 
 matrixCalcu::~matrixCalcu()
 {
     delete ui;
+}
+
+void matrixCalcu::updateButtonStyles()
+{
+    QString checkedStyle = "color: black; background-color: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 #F6A5CC, stop:1 #B02E6D);";
+    QString uncheckedStyle = "";
+
+    foreach(QAbstractButton *button, buttonGroup->buttons()) {
+        button->setStyleSheet(button->isChecked() ? checkedStyle : uncheckedStyle);
+    }
 }
 
 void matrixCalcu::switch_page_simpleOperation_1()
@@ -71,6 +104,27 @@ void matrixCalcu::clear_matrixA_size_2()
     ui->lineEdit_matrixA_cols_2->clear();
 }
 
+void matrixCalcu::clear_matrixA_entries()
+{
+    for (int x = 0; x < lineEdit_matrixA.size(); x++) {
+        lineEdit_matrixA[x]->clear();
+    }
+}
+
+void matrixCalcu::clear_matrixB_entries()
+{
+    for (int x = 0; x < lineEdit_matrixB.size(); x++) {
+        lineEdit_matrixB[x]->clear();
+    }
+}
+
+void matrixCalcu::clear_matrixA_2_entries()
+{
+    for (int x = 0; x < lineEdit_matrixA_2.size(); x++) {
+        lineEdit_matrixA_2[x]->clear();
+    }
+}
+
 void matrixCalcu::enter_simpleOperation_1()
 {
     // For Matrix A Entries
@@ -91,7 +145,7 @@ void matrixCalcu::enter_simpleOperation_1()
         }
 
         int rowNumA = 0; int colNumA = 0; int iA = 0;
-        QLineEdit* lineEdit_matrixA[matrixA_size];
+        lineEdit_matrixA.resize(matrixA_size);
         for (int x = 0; x < matrixA_size; x++) {
             lineEdit_matrixA[x] = new QLineEdit();
         }
@@ -134,7 +188,7 @@ void matrixCalcu::enter_simpleOperation_2()
         int matrixB_size = matrixB_rows*matrixB_cols;
 
         int rowNumB = 0; int colNumB = 0; int iB = 0;
-        QLineEdit* lineEdit_matrixB[matrixB_size];
+        lineEdit_matrixB.resize(matrixB_size);
         for (int x = 0; x < matrixB_size; x++) {
             lineEdit_matrixB[x] = new QLineEdit();
         }
@@ -186,7 +240,7 @@ void matrixCalcu::enter_advancedOperation_1()
         }
 
         int rowNumA = 0; int colNumA = 0; int iA = 0;
-        QLineEdit* lineEdit_matrixA_2[matrixA_size];
+        lineEdit_matrixA_2.resize(matrixA_size);
         for (int x = 0; x < matrixA_size; x++) {
             lineEdit_matrixA_2[x] = new QLineEdit();
         }
