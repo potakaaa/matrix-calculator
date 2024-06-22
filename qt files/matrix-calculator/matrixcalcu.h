@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QButtonGroup>
 #include <QPushButton>
+#include <QLineEdit>
+#include <QGridLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -40,7 +42,7 @@ public slots:
     void enter_advancedOperation_1();
     void updateButtonStyles();
     void clear_matrixA_2_entries();
-
+    void remove_existingMatrix(QGridLayout* gridLayout);
 
 };
 #endif // MATRIXCALCU_H

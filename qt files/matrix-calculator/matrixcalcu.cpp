@@ -81,6 +81,9 @@ void matrixCalcu::updateButtonStyles()
 void matrixCalcu::switch_page_simpleOperation_1()
 {
     clear_matrixA_size();
+    remove_existingMatrix(ui->gridLayout);
+    remove_existingMatrix(ui->gridLayout_2);
+    remove_existingMatrix(ui->gridLayout_5);
     ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
 }
 
@@ -125,16 +128,37 @@ void matrixCalcu::clear_matrixA_2_entries()
     }
 }
 
+void matrixCalcu::remove_existingMatrix(QGridLayout* gridLayout)
+{
+
+    // Check if the grid layout is not null
+    if (!gridLayout)
+        return;
+
+    // Iterate over all items in the grid layout
+    while (QLayoutItem* item = gridLayout->takeAt(0)) {
+        // If the item is a widget, remove it from the layout
+        if (QWidget* widget = item->widget()) {
+            gridLayout->removeWidget(widget);
+            widget->setParent(nullptr); // Remove the widget from the layout without deleting it
+        }
+        // Delete the layout item
+        delete item;
+    }
+}
+
 void matrixCalcu::enter_simpleOperation_1()
 {
     // For Matrix A Entries
     // Placeholder for matrix A size
+    remove_existingMatrix(ui->gridLayout);
     try {
         QString a_rows = ui->lineEdit_matrixA_rows->text(); QString a_cols = ui->lineEdit_matrixA_cols->text();
         QString b_rows = ui->lineEdit_matrixB_rows->text(); QString b_cols = ui->lineEdit_matrixB_cols->text();
         int matrixA_rows = to_int(ui->lineEdit_matrixA_rows->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols->text());
         int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_cols->text());
         int matrixA_size = matrixA_rows*matrixA_cols;
+
         if (matrixA_rows > 6 || matrixA_cols > 6 || matrixB_rows > 6 || matrixB_cols > 6) {
             QString message = "Matrix size is limited to 6x6 only!";
             throw SizeTooLargeException(message);
@@ -147,12 +171,13 @@ void matrixCalcu::enter_simpleOperation_1()
 
         int rowNumA = 0; int colNumA = 0; int iA = 0;
         lineEdit_matrixA.resize(matrixA_size);
-        for (int x = 0; x < matrixA_size; x++) {
-            lineEdit_matrixA[x] = new QLineEdit();
-        }
 
         ui->gridLayout->addWidget(ui->label_enterMatrixA_entry, 0, 0, 1, matrixA_cols);
         ui->gridLayout->addWidget(ui->label_matrixA_size_entry, matrixA_rows+1, 0, 1, matrixA_cols);
+
+        for (int x = 0; x < matrixA_size; x++) {
+            lineEdit_matrixA[x] = new QLineEdit();
+        }
 
         for (rowNumA = 1; rowNumA < matrixA_rows+1; rowNumA++) {
             for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
@@ -167,8 +192,21 @@ void matrixCalcu::enter_simpleOperation_1()
                                    "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
                                    "margin: 5px 2px;}");
 
-        ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA);
+        if (ui->button_addition->isChecked() || ui->button_subtraction->isChecked()) {
+            if (a_rows == b_rows && a_cols == b_cols) {
 
+                ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA);
+            } else {
+                showError("Matrix should be equivalent");
+            }
+        } else if (ui->button_multiplication->isChecked()) {
+            if (a_cols == b_rows) {
+
+                ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA);
+            } else {
+                showError("Matrices are not compatible!");
+            }
+        }
     } catch (SizeTooLargeException e) {
         qDebug() << "Caught SizeTooLargeException:" << e.message();
         showError(e.message());
@@ -178,12 +216,14 @@ void matrixCalcu::enter_simpleOperation_1()
         showError(e.message());
         ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
     }
+
 }
 
 void matrixCalcu::enter_simpleOperation_2()
 {
     // For Matrix B Entries
     // Placeholder for matrix B size
+    remove_existingMatrix(ui->gridLayout_2);
     try {
         int matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); int matrixB_cols = to_int(ui->lineEdit_matrixB_rows->text());
         int matrixB_size = matrixB_rows*matrixB_cols;
@@ -225,6 +265,7 @@ void matrixCalcu::enter_advancedOperation_1()
 {
     // For Matrix A advanced operation Entries
     // Placeholder for matrix A size
+    remove_existingMatrix(ui->gridLayout_5);
     try {
         QString a_rows = ui->lineEdit_matrixA_rows_2->text(); QString a_cols = ui->lineEdit_matrixA_cols_2->text();
         int matrixA_rows = to_int(ui->lineEdit_matrixA_rows_2->text()); int matrixA_cols = to_int(ui->lineEdit_matrixA_cols_2->text());
@@ -258,11 +299,20 @@ void matrixCalcu::enter_advancedOperation_1()
         }
 
         ui->frame_10->setStyleSheet("#frame_10 QLineEdit { border-radius: 7px; "
-                                   "max-width: 300px; min-height: 50px; "
-                                   "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
-                                   "margin: 5px 2px;}");
+                                    "max-width: 300px; min-height: 50px; "
+                                    "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                    "margin: 5px 2px;}");
 
-        ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA_advanced);
+
+        if (ui->button_determinant->isChecked() || ui->button_inverse->isChecked()) {
+            if (a_rows == a_cols) {
+                ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA_advanced);
+            } else {
+                showError("Matrix is not square!");
+            }
+        } else {
+            ui->stackedWidget->setCurrentWidget(ui->page_enterMatrixA_advanced);
+        }
 
     } catch (SizeTooLargeException e) {
         qDebug() << "Caught SizeTooLargeException:" << e.message();
@@ -316,6 +366,7 @@ void matrixCalcu::showError(const QString message)
     msgBox.setText(message);
     msgBox.exec();
 }
+
 
 
 
