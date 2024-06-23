@@ -40,6 +40,9 @@ private:
     void multiplication();
     void determinant_output(double det);
 
+    void inverse();
+    void RowEchelon();
+
 public slots:
     void switch_page_simpleOperation_1();
     void switch_page_advancedOperation_1();

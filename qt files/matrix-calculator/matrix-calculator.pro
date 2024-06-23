@@ -14,6 +14,8 @@ SOURCES += \
 
 HEADERS += \
     exceptions.h \
+    gauss.h \
+    inverse.h \
     matrixcalcu.h
 
 FORMS += \

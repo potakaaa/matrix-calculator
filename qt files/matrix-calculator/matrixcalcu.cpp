@@ -1,6 +1,8 @@
 #include "matrixcalcu.h"
 #include "ui_matrixcalcu.h"
 #include "exceptions.h"
+#include "gauss.h"
+#include "inverse.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
@@ -20,6 +22,7 @@ int matrixA_rows;
 int matrixA_cols;
 int matrixB_rows;
 int matrixB_cols;
+bool inverse_flag;
 
 
 matrixCalcu::matrixCalcu(QWidget *parent)
@@ -457,6 +460,15 @@ void matrixCalcu::resultMatrix_2()
             bool validator = checkMatrixEntries_ifNumeric(lineEdit_matrixA_2);
              if (validator) {
                 qDebug() << "0.8";
+                 if (ui->button_ref->isChecked() || ui->button_rref->isChecked()){
+                    remove_existingMatrix(ui->gridLayout_3);
+                    RowEchelon();
+
+                 }
+                 if (ui->button_inverse->isChecked()){
+                     remove_existingMatrix(ui->gridLayout_3);
+                     inverse();
+                 }
                  if (ui->button_transpose->isChecked()) {
                      int row_num = 0; int col_num = 0; int counter = 0;
                      remove_existingMatrix(ui->gridLayout_3);
@@ -875,6 +887,140 @@ void matrixCalcu::determinant_output(double det)
 
 }
 
+void matrixCalcu::inverse()
+{
+    matrixA = extractLineEditText(lineEdit_matrixA_2, matrixA_rows, matrixA_cols);
+    std::vector<std::vector<double>> result;
+
+    try {
+
+        if (determinant(matrixA) == 0){
+            throw runtime_error("Inverse does not exist (determinant is zero).");
+            showError("Determinant is Zero");
+            inverse_flag = false;
+        }
+        else{
+            inverse_flag = true;
+            result = inverseMatrix(matrixA);
+
+            int rowNumA = 0; int colNumA = 0; int iA = 0;
+            int row_n = matrixA_rows; int col_n = matrixA_cols;
+            lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
+
+            for (int x = 0; x < lineEdit_matrixResult.size(); x++) {
+                lineEdit_matrixResult[x] = new QLineEdit();
+            }
+            ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, matrixA_cols);
+            ui->gridLayout_3->addWidget(ui->label_matrixResult_size, matrixA_rows+1, 0, 1, matrixA_cols);
+            qDebug() << matrixA.size();
+            int layout_row = 1;
+            for (rowNumA = 0, layout_row = 1; rowNumA < matrixA_rows; rowNumA++, layout_row++) {
+                qDebug() << "2.8";
+                for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
+                    ui->gridLayout_3->addWidget(lineEdit_matrixResult[iA], layout_row, colNumA);
+                    lineEdit_matrixResult[iA]->setText(QString::number(result[rowNumA][colNumA]));
+                    lineEdit_matrixResult[iA]->setReadOnly(true);
+                    lineEdit_matrixResult[iA]->setAlignment(Qt::AlignHCenter);
+                    iA++;
+                }
+
+            }
+        }
+
+    }
+    catch (runtime_error){
+        qDebug() << "No Determinant";
+        showError("Determinant is Zero!\nInverse Does Not Exist!");
+    }
+}
+
+void matrixCalcu::RowEchelon()
+{
+    matrixA = extractLineEditText(lineEdit_matrixA_2, matrixA_rows, matrixA_cols);
+    std::vector<std::vector<double>> result;
+    int next_row_id = 0;
+    vector<Position> pivot_positions;
+    for (int col = 0; col < matrixA_cols; col++)
+    {
+        int nonzero_row_id = is_nonzero_column(matrixA, col, matrixA_rows, next_row_id);
+        if (nonzero_row_id >= 0)
+        {
+            qDebug() << "discovered leftmost nonzero column " << col
+                     << ", and topmost nonzero row " << nonzero_row_id << Qt::endl;
+            if (nonzero_row_id != next_row_id)
+            {
+                qDebug() << "exchanged row " << next_row_id << " and row " << nonzero_row_id << Qt::endl;
+                row_exchange(matrixA.begin() + next_row_id, matrixA.begin() + nonzero_row_id);
+                nonzero_row_id = next_row_id;
+            }
+            qDebug() << "selected pivot at position (row=" << nonzero_row_id << ",col=" << col << ") with value "
+                     << matrixA[nonzero_row_id][col] << Qt::endl;
+            pivot_positions.push_back(Position(nonzero_row_id, col));
+            for (int row = next_row_id; row < matrixA_rows; row++)
+            {
+                if (matrixA[row][col] == 0)
+                    continue;
+                if (row == nonzero_row_id)
+                    continue;
+                qDebug() << "adding " << -matrixA[row][col] / matrixA[nonzero_row_id][col]
+                         << " times of row " << nonzero_row_id << " onto row " << row << Qt::endl;
+                row_replace(matrixA.begin() + row,
+                            matrixA.begin() + nonzero_row_id,
+                            -matrixA[row][col] / matrixA[nonzero_row_id][col]);
+            }
+            next_row_id++;
+        }
+        else
+        {
+            continue;
+        }
+    }
+
+    for (vector<Position>::iterator pos = pivot_positions.begin(); pos != pivot_positions.end(); pos++) {
+
+        if (matrixA[pos->row][pos->col] != 1.0) {
+            qDebug() << "scaling row " << pos->row << " by " << 1.0 / matrixA[pos->row][pos->col] << Qt::endl;
+            row_scale(matrixA.begin() + pos->row, 1.0 / matrixA[pos->row][pos->col]);
+        }
+
+        if (ui->button_rref->isChecked()){
+            for (int row = 0; row < matrixA_rows; row++) {
+                if (matrixA[row][pos->col] != 0 && row != pos->row) {
+                    qDebug() << "adding " << -matrixA[row][pos->col] / matrixA[pos->row][pos->col]
+                             << " times of row " << pos->row << " onto row " << row << Qt::endl;
+                    row_replace(matrixA.begin() + row, matrixA.begin() + pos->row,
+                                -matrixA[row][pos->col] / matrixA[pos->row][pos->col]);
+                }
+            }
+        }
+    }
+    result = matrixA;
+    int rowNumA = 0; int colNumA = 0; int iA = 0;
+    int row_n = matrixA_rows; int col_n = matrixA_cols;
+    lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
+    qDebug() << "2.4";
+    qDebug() << "matrix size: " << matrixA_rows*matrixA_cols;
+    for (int x = 0; x < lineEdit_matrixResult.size(); x++) {
+        lineEdit_matrixResult[x] = new QLineEdit();
+    }
+    ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, matrixA_cols);
+    ui->gridLayout_3->addWidget(ui->label_matrixResult_size, matrixA_rows+1, 0, 1, matrixA_cols);
+    qDebug() << matrixA.size();
+    int layout_row = 1;
+    for (rowNumA = 0, layout_row = 1; rowNumA < matrixA_rows; rowNumA++, layout_row++) {
+        qDebug() << "2.8";
+        for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
+            ui->gridLayout_3->addWidget(lineEdit_matrixResult[iA], layout_row, colNumA);
+            lineEdit_matrixResult[iA]->setText(QString::number(result[rowNumA][colNumA]));
+            lineEdit_matrixResult[iA]->setReadOnly(true);
+            lineEdit_matrixResult[iA]->setAlignment(Qt::AlignHCenter);
+            iA++;
+        }
+
+    }
+
+    qDebug() << "4";
+}
 
 
 
