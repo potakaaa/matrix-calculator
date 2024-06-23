@@ -7,6 +7,7 @@
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
 #include <QString>
+#include <QPixmap>
 
 #include <vector>
 
@@ -31,6 +32,10 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     , buttonGroup(new QButtonGroup(this))
 {
     ui->setupUi(this);
+    QPixmap pix("D:/Documents/SCHOOL WORKS/1ST YEAR BS CS1A/2ND SEM/CS121 - Computer Programming 2/Matrix Calculator/logo/CS CALC.png");
+    const int logoSize = 90;
+    ui->label_logo->setFixedSize(190, logoSize);
+    ui->label_logo->setPixmap(pix.scaled(80, 80));
 
     setWindowTitle("Matrix Calculator");
 
@@ -40,6 +45,7 @@ matrixCalcu::matrixCalcu(QWidget *parent)
 
     **/
 
+    ui->stackedWidget->setCurrentWidget(ui->page_home);
 
     // Sidebar button functionalities
     connect(ui->button_addition, SIGNAL(clicked()), this, SLOT(switch_page_simpleOperation_1()));
