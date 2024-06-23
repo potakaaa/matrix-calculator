@@ -42,6 +42,7 @@ private:
 
     void inverse();
     void RowEchelon();
+    bool isDarkMode();
 
 public slots:
     void switch_page_simpleOperation_1();

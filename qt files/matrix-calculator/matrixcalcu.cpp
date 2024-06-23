@@ -3,11 +3,13 @@
 #include "exceptions.h"
 #include "gauss.h"
 #include "inverse.h"
+#include "add_text.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
 #include <QString>
 #include <QPixmap>
+#include <QSettings>
 
 #include <vector>
 
@@ -37,7 +39,17 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     QPixmap scaled = pix.scaled(sideLength, sideLength, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->label_logo->setPixmap(scaled);
 
+    QString s1 = "Matrix"; QString s2 = "Calculator"; QString sp = " ";
+
+    spec_string txt1(s1); spec_string txt2(s2); spec_string txt_result;
+    txt_result = s1 + sp + s2;
+    ui->label_welcome->setText(txt_result.to_qstring(txt_result));
+
+
     setWindowTitle("Matrix Calculator");
+
+    ui->frame_2->setStyleSheet("border: none;");
+    ui->frame->setStyleSheet("border: none;");
 
     /**
 
@@ -107,12 +119,15 @@ void matrixCalcu::switch_page_simpleOperation_1()
     remove_existingMatrix(ui->gridLayout_2);
     remove_existingMatrix(ui->gridLayout_5);
     remove_existingMatrix(ui->gridLayout_3);
+
     ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
+
 }
 
 void matrixCalcu::switch_page_advancedOperation_1()
 {
     clear_matrixA_size_2();
+
     ui->stackedWidget->setCurrentWidget(ui->page_advancedOperation_1);
 }
 
@@ -474,9 +489,11 @@ void matrixCalcu::resultMatrix_2()
 
                  }
                  if (ui->button_inverse->isChecked()){
+                     inverse_flag = false;
                      ui->label_matrixResult_size->setText(ui->lineEdit_matrixA_rows_2->text() + " x " + ui->lineEdit_matrixA_cols_2->text());
                      remove_existingMatrix(ui->gridLayout_3);
                      inverse();
+
                  }
                  if (ui->button_transpose->isChecked()) {
                      int row_num = 0; int col_num = 0; int counter = 0;
@@ -566,7 +583,12 @@ void matrixCalcu::resultMatrix_2()
                                              "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
                                              "margin: 5px 2px;}");
 
-                 ui->stackedWidget->setCurrentWidget(ui->page_matrixResult);
+                 qDebug() << inverse_flag;
+                 if (inverse_flag) {
+                     ui->stackedWidget->setCurrentWidget(ui->page_matrixResult);
+                 } else {
+
+                 }
 
              }
 
@@ -602,7 +624,7 @@ bool matrixCalcu::checkMatrixEntries_ifNumeric(std::vector<QLineEdit *> lineEdit
 std::vector<std::vector<double>> matrixCalcu::transpose(const std::vector<std::vector<double>> &matrix)
 {
     qDebug() << "4";
-
+    inverse_flag = true;
     // Check if the matrix is empty
     if (matrix.empty()) {
         qDebug() << "Matrix is empty";
@@ -867,17 +889,19 @@ void matrixCalcu::multiplication() {
 
 void matrixCalcu::determinant_output(double det)
 {
+    inverse_flag = true;
+    qDebug() << "b1";
     ui->label_matrixResult_size->setText("Determinant: " + QString::number(det));
     ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, to_int(ui->lineEdit_matrixA_cols_2->text()));
     ui->gridLayout_3->addWidget(ui->label_matrixResult_size, to_int(ui->lineEdit_matrixA_rows_2->text()) + 1, 0, 1, to_int(ui->lineEdit_matrixA_cols_2->text()));
 
     lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
-
+    qDebug() << "b2";
     for (int x = 0; x < matrixA_rows * matrixA_cols; x++) {
         lineEdit_matrixResult[x] = new QLineEdit();
     }
 
-
+    qDebug() << "b3";
     answer = extractLineEditText(lineEdit_matrixA_2, matrixA_rows, matrixA_cols);
     int layout_row = 0; int iA = 0;
     for (int rowNumA = 0, layout_row = 1; rowNumA < matrixA_rows; rowNumA++, layout_row++) {
@@ -890,6 +914,7 @@ void matrixCalcu::determinant_output(double det)
         }
 
     }
+    qDebug() << "b4";
 
     ui->frame_11->setStyleSheet("#frame_11 QLineEdit { border-radius: 7px; "
                                 "max-width: 300px; min-height: 50px; "
@@ -947,6 +972,7 @@ void matrixCalcu::inverse()
 
 void matrixCalcu::RowEchelon()
 {
+    inverse_flag = true;
     matrixA = extractLineEditText(lineEdit_matrixA_2, matrixA_rows, matrixA_cols);
     std::vector<std::vector<double>> result;
     int next_row_id = 0;
@@ -1035,6 +1061,7 @@ void matrixCalcu::RowEchelon()
     qDebug() << "4";
 }
 
+
 QString matrixCalcu::reverseString(QString txt, int size, QString& rev)
 {
     qDebug() << "a";
@@ -1046,6 +1073,12 @@ QString matrixCalcu::reverseString(QString txt, int size, QString& rev)
     qDebug() << "a2";
     return reverseString(txt, size-1, rev);
 
+}
+
+bool matrixCalcu::isDarkMode()
+{
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
+    return settings.value("AppsUseLightTheme").toInt() == 0;
 }
 
 

@@ -26,7 +26,12 @@
    <string>matrixCalcu</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QMainWindow {
+   <string notr="true">QLineEdit {
+	background-color: white;
+	color: black;
+}
+
+QMainWindow {
 	background-color: qlineargradient(spread:pad, x1:0.514, y1:0, x2:0.508, y2:1, stop:0 rgba(22, 22, 40, 255), stop:1 rgba(49, 50, 88, 255));
 }
 
@@ -505,7 +510,7 @@
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>3</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="page_home">
             <property name="maximumSize">

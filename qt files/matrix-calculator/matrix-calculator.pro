@@ -13,6 +13,7 @@ SOURCES += \
     matrixcalcu.cpp
 
 HEADERS += \
+    add_text.h \
     exceptions.h \
     gauss.h \
     inverse.h \
