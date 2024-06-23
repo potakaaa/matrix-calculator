@@ -55,7 +55,7 @@ We welcome contributions to enhance the Matrix Calculator. Here’s how you can 
 
 ## 📞 Contact
 
-If you have any questions or feedback, please feel free to reach out to us at [helbirog@example.com](mailto:helbiro@gmail.com).
+If you have any questions or feedback, please feel free to reach out to us at [helbirog@gmail.com](mailto:helbiro@gmail.com).
 
 ---
 
