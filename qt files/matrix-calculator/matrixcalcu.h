@@ -33,6 +33,12 @@ private:
     std::vector<std::vector<double>> transpose(const std::vector<std::vector<double>>& matrix);
     void populateMatrixA();
     std::vector<std::vector<double>> extractLineEditText(std::vector<QLineEdit*> lineEdits, int rows, int cols);
+    double determinant(const std::vector<std::vector<double>>& matrix);
+
+    void addition();
+    void subtraction();
+    void multiplication();
+    void determinant_output(double det);
 
 public slots:
     void switch_page_simpleOperation_1();

@@ -221,6 +221,8 @@ void matrixCalcu::enter_simpleOperation_1()
 
 void matrixCalcu::enter_simpleOperation_2()
 {
+    qDebug() << "what";
+    matrixA = extractLineEditText(lineEdit_matrixA, matrixA_rows, matrixA_cols);
     // For Matrix B Entries
     // Placeholder for matrix B size
     remove_existingMatrix(ui->gridLayout_2);
@@ -229,8 +231,6 @@ void matrixCalcu::enter_simpleOperation_2()
             throw InputIsEmpty("Matrix input is empty!");
             showError("Matrix input is empty!");
         }
-
-        bool validator = checkMatrixEntries_ifNumeric(lineEdit_matrixA);
 
         matrixB_rows = to_int(ui->lineEdit_matrixB_rows->text()); matrixB_cols = to_int(ui->lineEdit_matrixB_cols->text());
         int matrixB_size = matrixB_rows*matrixB_cols;
@@ -241,13 +241,12 @@ void matrixCalcu::enter_simpleOperation_2()
             lineEdit_matrixB[x] = new QLineEdit();
         }
 
-        ui->gridLayout_3->addWidget(ui->label_enterMatrixB_entry, 0, 0, 1, matrixB_cols);
-        ui->gridLayout_3->addWidget(ui->label_matrixB_size_entry, matrixB_rows+1, 0, 1, matrixB_cols);
+        ui->gridLayout_2->addWidget(ui->label_enterMatrixB_entry, 0, 0, 1, matrixB_cols);
+        ui->gridLayout_2->addWidget(ui->label_matrixB_size_entry, matrixB_rows+1, 0, 1, matrixB_cols);
 
         for (rowNumB = 1; rowNumB < matrixB_rows+1; rowNumB++) {
             for(colNumB = 0; colNumB < matrixB_cols; colNumB++) {
-                ui->gridLayout_3->addWidget(lineEdit_matrixB[iB], rowNumB, colNumB);
-
+                ui->gridLayout_2->addWidget(lineEdit_matrixB[iB], rowNumB, colNumB);
                 iB++;
             }
 
@@ -265,6 +264,7 @@ void matrixCalcu::enter_simpleOperation_2()
     } catch(const NonNumericException e) {
         qDebug() << "Caught NonNumericException:" << e.message();
         showError(e.message());
+        ui->stackedWidget->setCurrentWidget(ui->page_simpleOperation_1);
     } catch(const InputIsEmpty e) {
         qDebug() << "Caught InputIsEmpty:" << e.message();
         showError(e.message());
@@ -431,6 +431,17 @@ void matrixCalcu::resultMatrix()
         showError(e.message());
 
     }
+
+    if (ui->button_addition->isChecked()){
+        addition();
+    }
+    if (ui->button_subtraction->isChecked()){
+        subtraction();
+    }
+    if (ui->button_multiplication->isChecked()){
+        multiplication();
+    }
+
 }
 
 void matrixCalcu::resultMatrix_2()
@@ -520,6 +531,11 @@ void matrixCalcu::resultMatrix_2()
                      }
 
                      qDebug() << "2";
+                 } if (ui->button_determinant->isChecked()) {
+                     int row_temp = matrixA_rows; int col_temp = matrixA_cols;
+                     std::vector<std::vector<double>> temp = extractLineEditText(lineEdit_matrixA_2, row_temp, col_temp);
+                     double determinant_temp = determinant(temp);
+                     determinant_output(determinant_temp);
                  }
 
                  ui->frame_11->setStyleSheet("#frame_11 QLineEdit { border-radius: 7px; "
@@ -641,6 +657,222 @@ std::vector<std::vector<double>> matrixCalcu::extractLineEditText(std::vector<QL
     }
 
     return result;
+}
+
+double matrixCalcu::determinant(const std::vector<std::vector<double> > &matrix)
+{
+    int n = matrix.size();
+
+    if (n == 1) {
+        return matrix[0][0];
+    }
+
+    if (n == 2) {
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    }
+
+    double det = 0;
+    for (int i = 0; i < n; ++i) {
+        std::vector<std::vector<double>> submatrix(n - 1, std::vector<double>(n - 1));
+        for (int j = 1; j < n; ++j) {
+            for (int k = 0; k < n; ++k) {
+                if (k < i) {
+                    submatrix[j - 1][k] = matrix[j][k];
+                } else if (k > i) {
+                    submatrix[j - 1][k - 1] = matrix[j][k];
+                }
+            }
+        }
+        det += (i % 2 == 0 ? 1 : -1) * matrix[0][i] * determinant(submatrix);
+    }
+
+    return det;
+}
+
+void matrixCalcu::addition()
+{
+    matrixB = extractLineEditText(lineEdit_matrixB, matrixB_rows, matrixB_cols);
+    qDebug() << "1";
+    std::vector<std::vector<double>> result;
+    result.resize(matrixA.size());
+    for (size_t i = 0; i < result.size(); ++i) {
+        result[i].resize(matrixA[0].size());
+    }
+    qDebug() << "2";
+    for (size_t i = 0; i < matrixA.size(); i++) {
+        for (size_t j = 0; j < matrixA[0].size(); j++) {
+            result[i][j] = matrixA[i][j] + matrixB[i][j];
+        }
+    }
+    qDebug() << "2.2";
+    int rowNumA = 0; int colNumA = 0; int iA = 0;
+
+    lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
+    qDebug() << "2.4";
+    qDebug() << "matrix size: " << matrixA_rows*matrixA_cols;
+    for (int x = 0; x < lineEdit_matrixResult.size(); x++) {
+        lineEdit_matrixResult[x] = new QLineEdit();
+    }
+    ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, matrixA_cols);
+    ui->gridLayout_3->addWidget(ui->label_matrixResult_size, matrixA_rows+1, 0, 1, matrixA_cols);
+    ui->label_matrixResult_size->setText(ui->lineEdit_matrixA_rows->text() + " x " + ui->lineEdit_matrixA_cols->text());
+    qDebug() << matrixA.size();
+    int layout_row = 1;
+    for (rowNumA = 0, layout_row = 1; rowNumA < matrixA_rows; rowNumA++, layout_row++) {
+        qDebug() << "2.8";
+        for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
+            ui->gridLayout_3->addWidget(lineEdit_matrixResult[iA], layout_row, colNumA);
+            lineEdit_matrixResult[iA]->setText(QString::number(result[rowNumA][colNumA]));
+            lineEdit_matrixResult[iA]->setReadOnly(true);
+            lineEdit_matrixResult[iA]->setAlignment(Qt::AlignHCenter);
+            iA++;
+        }
+
+    }
+    ui->frame_11->setStyleSheet("#frame_11 QLineEdit { border-radius: 7px; "
+                                "max-width: 300px; min-height: 50px; "
+                                "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                "margin: 5px 2px;}");
+    qDebug() << "4";
+}
+
+void matrixCalcu::subtraction()
+{
+    matrixB = extractLineEditText(lineEdit_matrixB, matrixB_rows, matrixB_cols);
+    std::vector<std::vector<double>> result;
+    result.resize(matrixA.size());
+    for (size_t i = 0; i < result.size(); ++i) {
+        result[i].resize(matrixA[0].size());
+    }
+
+    for (size_t i = 0; i < matrixA.size(); i++) {
+        for (size_t j = 0; j < matrixA[0].size(); j++) {
+            result[i][j] = matrixA[i][j] - matrixB[i][j];
+        }
+    }
+
+
+    int rowNumA = 0; int colNumA = 0; int iA = 0;
+    lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
+
+    for (int x = 0; x < matrixA_rows * matrixA_cols; x++) {
+        lineEdit_matrixResult[x] = new QLineEdit();
+    }
+    ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, matrixA_cols);
+    ui->gridLayout_3->addWidget(ui->label_matrixResult_size, matrixA_rows+1, 0, 1, matrixA_cols);
+    ui->label_matrixResult_size->setText(ui->lineEdit_matrixA_rows->text() + " x " + ui->lineEdit_matrixA_cols->text());
+    qDebug() << matrixA.size();
+    int layout_row = 1;
+    for (rowNumA = 0, layout_row = 1; rowNumA < matrixA_rows; rowNumA++, layout_row++) {
+        for(colNumA = 0; colNumA < matrixA_cols; colNumA++) {
+            ui->gridLayout_3->addWidget(lineEdit_matrixResult[iA], layout_row, colNumA);
+            lineEdit_matrixResult[iA]->setText(QString::number(result[rowNumA][colNumA]));
+            lineEdit_matrixResult[iA]->setReadOnly(true);
+            lineEdit_matrixResult[iA]->setAlignment(Qt::AlignHCenter);
+            iA++;
+        }
+
+    }
+
+    ui->frame_11->setStyleSheet("#frame_11 QLineEdit { border-radius: 7px; "
+                                "max-width: 300px; min-height: 50px; "
+                                "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                "margin: 5px 2px;}");
+}
+
+void matrixCalcu::multiplication() {
+    // Ensure matrix dimensions are compatible for multiplication
+    if (matrixA_cols != matrixB_rows) {
+        qDebug() << "Matrix dimensions are not compatible for multiplication!";
+        return;
+    }
+
+    std::vector<std::vector<double>> result(matrixA_rows, std::vector<double>(matrixB_cols, 0.0));
+
+    // Fill matrixB with values
+    matrixB = extractLineEditText(lineEdit_matrixB, matrixB_rows, matrixB_cols);
+    qDebug() << "Matrix B extracted";
+
+    // Matrix multiplication
+    for (int i = 0; i < matrixA_rows; i++) {
+        for (int j = 0; j < matrixB_cols; j++) {
+            for (int k = 0; k < matrixA_cols; k++) {
+                result[i][j] += matrixA[i][k] * matrixB[k][j];
+            }
+        }
+    }
+
+    qDebug() << "Matrix multiplication completed";
+
+    // Resize lineEdit_matrixResult to match result matrix dimensions
+    int totalElements = matrixA_rows * matrixB_cols;
+    lineEdit_matrixResult.resize(totalElements);
+    qDebug() << "lineEdit_matrixResult resized to " << totalElements;
+
+    // Create QLineEdit objects for the result matrix
+    for (int x = 0; x < totalElements; x++) {
+        lineEdit_matrixResult[x] = new QLineEdit();
+    }
+
+    qDebug() << "QLineEdit objects created";
+
+    // Display result matrix
+    int row_new = matrixA_rows;
+    int col_new = matrixB_cols;
+    ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, col_new);
+    ui->gridLayout_3->addWidget(ui->label_matrixResult_size, row_new + 1, 0, 1, col_new);
+    ui->label_matrixResult_size->setText(ui->lineEdit_matrixA_rows->text() + " x " + ui->lineEdit_matrixB_cols->text());
+
+    int iA = 0;
+    for (int rowNumA = 0, layout_row = 1; rowNumA < row_new; rowNumA++, layout_row++) {
+        for (int colNumA = 0; colNumA < col_new; colNumA++) {
+            ui->gridLayout_3->addWidget(lineEdit_matrixResult[iA], layout_row, colNumA);
+            lineEdit_matrixResult[iA]->setText(QString::number(result[rowNumA][colNumA]));
+            lineEdit_matrixResult[iA]->setReadOnly(true);
+            lineEdit_matrixResult[iA]->setAlignment(Qt::AlignHCenter);
+            iA++;
+        }
+    }
+
+    ui->frame_11->setStyleSheet("#frame_11 QLineEdit { border-radius: 7px; "
+                                "max-width: 300px; min-height: 50px; "
+                                "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                "margin: 5px 2px;}");
+
+    qDebug() << "Result matrix displayed";
+}
+
+void matrixCalcu::determinant_output(double det)
+{
+    ui->label_matrixResult_size->setText("Determinant: " + QString::number(det));
+    ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, to_int(ui->lineEdit_matrixA_cols_2->text()));
+    ui->gridLayout_3->addWidget(ui->label_matrixResult_size, to_int(ui->lineEdit_matrixA_rows_2->text()) + 1, 0, 1, to_int(ui->lineEdit_matrixA_cols_2->text()));
+
+    lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
+
+    for (int x = 0; x < matrixA_rows * matrixA_cols; x++) {
+        lineEdit_matrixResult[x] = new QLineEdit();
+    }
+
+
+    answer = extractLineEditText(lineEdit_matrixA_2, matrixA_rows, matrixA_cols);
+    int layout_row = 0; int iA = 0;
+    for (int rowNumA = 0, layout_row = 1; rowNumA < matrixA_rows; rowNumA++, layout_row++) {
+        for(int colNumA = 0; colNumA < matrixA_cols; colNumA++) {
+            ui->gridLayout_3->addWidget(lineEdit_matrixResult[iA], layout_row, colNumA);
+            lineEdit_matrixResult[iA]->setText(QString::number(answer[rowNumA][colNumA]));
+            lineEdit_matrixResult[iA]->setReadOnly(true);
+            lineEdit_matrixResult[iA]->setAlignment(Qt::AlignHCenter);
+            iA++;
+        }
+
+    }
+
+    ui->frame_11->setStyleSheet("#frame_11 QLineEdit { border-radius: 7px; "
+                                "max-width: 300px; min-height: 50px; "
+                                "font: bold 25px \"DM Sans\" ;qproperty-alignment: AlignCenter; "
+                                "margin: 5px 2px;}");
+
 }
 
 
