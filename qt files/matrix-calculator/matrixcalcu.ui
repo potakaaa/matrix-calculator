@@ -510,7 +510,7 @@ QMainWindow {
          <item>
           <widget class="QStackedWidget" name="stackedWidget">
            <property name="currentIndex">
-            <number>0</number>
+            <number>6</number>
            </property>
            <widget class="QWidget" name="page_home">
             <property name="maximumSize">
@@ -1732,7 +1732,7 @@ QMainWindow {
                     <cursorShape>PointingHandCursor</cursorShape>
                    </property>
                    <property name="text">
-                    <string>Clear</string>
+                    <string>Home</string>
                    </property>
                   </widget>
                  </item>

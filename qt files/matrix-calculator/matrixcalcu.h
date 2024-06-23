@@ -65,6 +65,8 @@ public slots:
     void resultMatrix();
     void resultMatrix_2();
     void on_printButton_clicked();
+    void home_button();
+    void resetButtons();
 
     QString reverseString(QString txt, int size, QString& rev);
 

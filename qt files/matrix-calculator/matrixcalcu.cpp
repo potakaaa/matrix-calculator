@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QRandomGenerator>
 #include <vector>
+#include <QStyle>
 
 std::vector<QLineEdit*> lineEdit_matrixA;
 std::vector<QLineEdit*> lineEdit_matrixB;
@@ -86,6 +87,8 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     connect(ui->pushButton_enter_matrixB_2, SIGNAL(clicked()), this, SLOT(resultMatrix()));
     connect(ui->pushButton_enter_matrixA_advanced, SIGNAL(clicked()), this, SLOT(resultMatrix_2()));
     connect(ui->pushButton_print_matrixResult, SIGNAL(clicked()), this, SLOT(on_printButton_clicked()));
+    connect(ui->pushButton_clear_matrixResult, SIGNAL(clicked()), this, SLOT(home_button()));
+
 
     buttonGroup->addButton(ui->button_addition);
     buttonGroup->addButton(ui->button_subtraction);
@@ -117,6 +120,15 @@ void matrixCalcu::updateButtonStyles()
 
     foreach(QAbstractButton *button, buttonGroup->buttons()) {
         button->setStyleSheet(button->isChecked() ? checkedStyle : uncheckedStyle);
+    }
+}
+
+void matrixCalcu::resetButtons() {
+    foreach(QAbstractButton *button, buttonGroup->buttons()) {
+        button->setChecked(false);
+        button->setStyleSheet("");
+        button->repaint();
+
     }
 }
 
@@ -1124,7 +1136,7 @@ void matrixCalcu::printMatrix(const QString &fileName) {
     painter.drawText(QPointF(titleX, startY-20), title);
     startY += spacing;
 
-    painter.setFont(QFont("DM Sans", 19, QFont::Bold));
+    painter.setFont(QFont("DM Sans", 16, QFont::Bold));
     if(ui->button_addition->isChecked()){
         QString txt_operation = "Operation: Addition";
         int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
@@ -1303,6 +1315,17 @@ void matrixCalcu::on_printButton_clicked() {
     // Save the PDF using the modified file name
     printMatrix(newFileName);
 
+}
+
+void matrixCalcu::home_button()
+{
+    remove_existingMatrix(ui->gridLayout);
+    remove_existingMatrix(ui->gridLayout_2);
+    remove_existingMatrix(ui->gridLayout_5);
+    remove_existingMatrix(ui->gridLayout_3);
+    resetButtons();
+
+    ui->stackedWidget->setCurrentWidget(ui->page_home);
 }
 
 
