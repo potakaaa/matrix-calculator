@@ -43,6 +43,10 @@ private:
     void inverse();
     void RowEchelon();
     bool isDarkMode();
+    void drawMatrix(QPainter &painter, const std::vector<std::vector<double>> &matrix, int startX, int startY);
+    void printMatrix(const QString &fileName);
+    QString generateRandomString();
+
 
 public slots:
     void switch_page_simpleOperation_1();
@@ -60,6 +64,7 @@ public slots:
     bool check_emptyMatrix(std::vector<QLineEdit*> lineEdit_vector);
     void resultMatrix();
     void resultMatrix_2();
+    void on_printButton_clicked();
 
     QString reverseString(QString txt, int size, QString& rev);
 

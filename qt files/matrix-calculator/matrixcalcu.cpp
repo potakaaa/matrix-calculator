@@ -10,7 +10,13 @@
 #include <QString>
 #include <QPixmap>
 #include <QSettings>
-
+#include <QPrinter>
+#include <QPainter>
+#include <QTextDocument>
+#include <QTextCursor>
+#include <QDebug>
+#include <QFileDialog>
+#include <QRandomGenerator>
 #include <vector>
 
 std::vector<QLineEdit*> lineEdit_matrixA;
@@ -26,6 +32,7 @@ int matrixA_cols;
 int matrixB_rows;
 int matrixB_cols;
 bool inverse_flag;
+double det;
 
 
 matrixCalcu::matrixCalcu(QWidget *parent)
@@ -78,6 +85,7 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     connect(ui->pushButton_clear_matrixA_advanced, SIGNAL(clicked()), this, SLOT(clear_matrixA_2_entries()));
     connect(ui->pushButton_enter_matrixB_2, SIGNAL(clicked()), this, SLOT(resultMatrix()));
     connect(ui->pushButton_enter_matrixA_advanced, SIGNAL(clicked()), this, SLOT(resultMatrix_2()));
+    connect(ui->pushButton_print_matrixResult, SIGNAL(clicked()), this, SLOT(on_printButton_clicked()));
 
     buttonGroup->addButton(ui->button_addition);
     buttonGroup->addButton(ui->button_subtraction);
@@ -245,7 +253,6 @@ void matrixCalcu::enter_simpleOperation_1()
 
 void matrixCalcu::enter_simpleOperation_2()
 {
-    qDebug() << "what";
     matrixA = extractLineEditText(lineEdit_matrixA, matrixA_rows, matrixA_cols);
     // For Matrix B Entries
     // Placeholder for matrix B size
@@ -501,6 +508,7 @@ void matrixCalcu::resultMatrix_2()
 
                      int answer_rows = to_int(ui->lineEdit_matrixA_rows_2->text()); int answer_cols = to_int(ui->lineEdit_matrixA_cols_2->text());
                      answer = extractLineEditText(lineEdit_matrixA_2, answer_rows, answer_cols);
+                     matrixA = extractLineEditText(lineEdit_matrixA_2, answer_rows, answer_cols);
 
                      qDebug() << "0.9";
 
@@ -529,6 +537,7 @@ void matrixCalcu::resultMatrix_2()
                          qDebug() << "Transposed matrix is empty or not initialized properly.";
                          return;
                      }
+                     answer = matrix_Transposed;
 
                      qDebug() << "Transposed Matrix:";
                      for (const auto& row : matrix_Transposed) {
@@ -576,6 +585,8 @@ void matrixCalcu::resultMatrix_2()
                      std::vector<std::vector<double>> temp = extractLineEditText(lineEdit_matrixA_2, row_temp, col_temp);
                      double determinant_temp = determinant(temp);
                      determinant_output(determinant_temp);
+                     matrixA = temp;
+                     det = determinant_temp;
                  }
 
                  ui->frame_11->setStyleSheet("#frame_11 QLineEdit { border-radius: 7px; "
@@ -752,6 +763,8 @@ void matrixCalcu::addition()
     qDebug() << "2.2";
     int rowNumA = 0; int colNumA = 0; int iA = 0;
 
+    answer = result;
+
     lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
     qDebug() << "2.4";
     qDebug() << "matrix size: " << matrixA_rows*matrixA_cols;
@@ -796,7 +809,7 @@ void matrixCalcu::subtraction()
         }
     }
 
-
+    answer = result;
     int rowNumA = 0; int colNumA = 0; int iA = 0;
     lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
 
@@ -846,7 +859,7 @@ void matrixCalcu::multiplication() {
             }
         }
     }
-
+    answer = result;
     qDebug() << "Matrix multiplication completed";
 
     // Resize lineEdit_matrixResult to match result matrix dimensions
@@ -960,7 +973,7 @@ void matrixCalcu::inverse()
                     iA++;
                 }
 
-            }
+            } answer = result;
         }
 
     }
@@ -974,6 +987,8 @@ void matrixCalcu::RowEchelon()
 {
     inverse_flag = true;
     matrixA = extractLineEditText(lineEdit_matrixA_2, matrixA_rows, matrixA_cols);
+    std::vector<std::vector<double>> original;
+    original = matrixA;
     std::vector<std::vector<double>> result;
     int next_row_id = 0;
     vector<Position> pivot_positions;
@@ -1034,6 +1049,8 @@ void matrixCalcu::RowEchelon()
         }
     }
     result = matrixA;
+    answer = result; // NEW
+    matrixA = original;
     int rowNumA = 0; int colNumA = 0; int iA = 0;
     int row_n = matrixA_rows; int col_n = matrixA_cols;
     lineEdit_matrixResult.resize(matrixA_rows*matrixA_cols);
@@ -1081,8 +1098,223 @@ bool matrixCalcu::isDarkMode()
     return settings.value("AppsUseLightTheme").toInt() == 0;
 }
 
+void matrixCalcu::printMatrix(const QString &fileName) {
+    qDebug() << "Printing matrices to PDF";
+
+    QPrinter printer;
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(fileName);
+
+    QPainter painter;
+    painter.begin(&printer);
+
+    int margin = 100;
+    int spacing = 70;
+    int startX = margin;
+    int startY = margin;
+
+    // Get the page size in points (1 inch = 72 points)
+    QRectF pageRect = printer.pageLayout().paintRectPixels(printer.resolution());
+
+    // Title of the document
+    painter.setFont(QFont("DM Sans", 27, QFont::Bold));
+    QString title = "Matrix Calculation Results";
+    int titleWidth = painter.fontMetrics().horizontalAdvance(title);
+    int titleX = (pageRect.width() - titleWidth) / 2;
+    painter.drawText(QPointF(titleX, startY-20), title);
+    startY += spacing;
+
+    painter.setFont(QFont("DM Sans", 19, QFont::Bold));
+    if(ui->button_addition->isChecked()){
+        QString txt_operation = "Operation: Addition";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+    if(ui->button_subtraction->isChecked()){
+        QString txt_operation = "Operation: Subtraction";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+    if(ui->button_multiplication->isChecked()){
+        QString txt_operation = "Operation: Multiplication";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+    if(ui->button_transpose->isChecked()){
+        QString txt_operation = "Operation: Transpose";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+    if(ui->button_inverse->isChecked()){
+        QString txt_operation = "Operation: Inverse";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+    if(ui->button_determinant->isChecked()){
+        QString txt_operation = "Operation: Determinant";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+    if(ui->button_ref->isChecked()){
+        QString txt_operation = "Operation: Row Echelon Form";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+    if(ui->button_rref->isChecked()){
+        QString txt_operation = "Operation: Reduced Row Echelon Form";
+        int text_oper = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(txt_operation))) / 2;
+        painter.drawText(QPointF(text_oper, startY-40), txt_operation);
+    }
+
+    // Display Matrix A
+    if (!matrixA.empty() && !matrixA[0].empty()) {
+        painter.setFont(QFont("DM Sans", 15, QFont::Bold));
+        QString matrixA_title = "Matrix A";
+        int matrixA_x = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(matrixA_title))) / 2;
+        painter.drawText(QPointF(matrixA_x, startY+25), matrixA_title);
+        startY += spacing;
+        drawMatrix(painter, matrixA, pageRect.width(), startY);
+
+        // Update startY to the next position
+        startY += (matrixA.size() * 50) + spacing;
+    } else {
+        QMessageBox::warning(this, "Warning", "Matrix A is empty or uninitialized.");
+    }
+
+    if (ui->button_addition->isChecked() || ui->button_subtraction->isChecked() || ui->button_multiplication->isChecked())
+    {
+        // Display Matrix B
+        if (!matrixB.empty() && !matrixB[0].empty()) {
+            if (startY + (matrixB.size() * 50) + spacing > pageRect.height()) {
+                printer.newPage();
+                startY = margin;
+            }
+
+            painter.setFont(QFont("DM Sans", 15, QFont::Bold));
+            QString matrixB_title = "Matrix B";
+            int matrixB_x = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(matrixB_title))) / 2;
+            painter.drawText(QPointF(matrixB_x, startY+20), matrixB_title);
+            startY += spacing;
+            drawMatrix(painter, matrixB, pageRect.width(), startY);
+
+            // Update startY to the next position
+            startY += (matrixB.size() * 50) + spacing;
+        } else {
+            QMessageBox::warning(this, "Warning", "Matrix B is empty or uninitialized.");
+        }
+    }
+    if (!ui->button_determinant->isChecked()) {
+        // Display Result Matrix (answer)
+        if (!answer.empty() && !answer[0].empty()) {
+            if (startY + (answer.size() * 20) + spacing+100 > pageRect.height()) {
+                printer.newPage();
+                startY = margin;
+            }
+
+            QString matrixAns_title = "Result Matrix";
+            int matrixAns_x = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(matrixAns_title))) / 2;
+            painter.setFont(QFont("DM Sans", 15, QFont::Bold));
+            painter.drawText(QPointF(matrixAns_x, startY+30), matrixAns_title);
+            startY += spacing;
+            drawMatrix(painter, answer, pageRect.width(), startY);
+        } else {
+            QMessageBox::warning(this, "Warning", "Result Matrix is empty or uninitialized.");
+        }
+    }
+    else{
+        startY += spacing;
+        QString determ_label = "Determinant: " + QString::number(det);
+        int det_label_width = (pageRect.width() - (painter.fontMetrics().horizontalAdvance(determ_label))) / 2;
+        painter.setFont(QFont("DM Sans", 15, QFont::Bold));
+        painter.drawText(QPointF(det_label_width, startY), determ_label);
+
+        startY += spacing;
+    }
+    startY = margin-45;
+    startY += spacing;
 
 
+    QMessageBox::information(this, "PDF Created", "PDF file saved as " + fileName);
+    painter.end();
+}
+
+
+
+
+
+
+
+void matrixCalcu::drawMatrix(QPainter &painter, const std::vector<std::vector<double>> &matrix, int pageWidth, int startY) {
+    if (matrix.empty() || matrix[0].empty()) {
+        return;
+    }
+
+    int rows = matrix.size();
+    int cols = matrix[0].size();
+
+    QFont font("DM Sans", 14, QFont::Bold);
+    painter.setFont(font);
+
+    int rectWidth = 110;
+    int rectHeight = 60;
+
+    int totalMatrixWidth = cols * rectWidth;
+    int startX = (pageWidth - totalMatrixWidth) / 2;
+
+    // Draw matrix content
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            QString text = QString::number(matrix[i][j]);
+            int x = startX + j * rectWidth;
+            int y = startY + i * rectHeight;
+            QRect rect(x, y, rectWidth, rectHeight);
+            painter.drawRect(rect);
+            painter.drawText(rect, Qt::AlignCenter, text);
+        }
+    }
+}
+
+void matrixCalcu::on_printButton_clicked() {
+    QString initialPath = QDir::homePath(); // Start in the user's home directory
+    QString filter = "PDF Files (*.pdf);;All Files (*)";
+
+    // Generate a random 10-digit string
+    QString randomString = generateRandomString();
+
+    QString fileName = QFileDialog::getSaveFileName(this, "Save PDF", initialPath, filter);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    // Append the random string to the base name
+    QFileInfo fileInfo(fileName);
+    QString baseName = fileInfo.baseName();
+    QString suffix = fileInfo.suffix();
+    QString path = fileInfo.path();
+
+    // Construct the new file name with the random string
+    QString newFileName = path + "/" + baseName + "_" + randomString;
+    if (!suffix.isEmpty()) {
+        newFileName += "." + suffix;
+    } else {
+        newFileName += ".pdf";
+    }
+
+    // Save the PDF using the modified file name
+    printMatrix(newFileName);
+
+}
+
+
+QString matrixCalcu::generateRandomString()
+{
+    QString randomString;
+    for (int i = 0; i < 10; ++i) {
+        int randomDigit = QRandomGenerator::global()->bounded(10); // generates a number between 0 and 9
+        randomString.append(QString::number(randomDigit));
+    }
+    return randomString;
+}
 
 
 
