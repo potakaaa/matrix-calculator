@@ -1,5 +1,6 @@
 QT       += core gui
 QT       += printsupport
+RC_ICONS = CS-CALC.ico
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
