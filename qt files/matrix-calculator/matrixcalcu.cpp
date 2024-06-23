@@ -32,10 +32,10 @@ matrixCalcu::matrixCalcu(QWidget *parent)
     , buttonGroup(new QButtonGroup(this))
 {
     ui->setupUi(this);
-    QPixmap pix("D:/Documents/SCHOOL WORKS/1ST YEAR BS CS1A/2ND SEM/CS121 - Computer Programming 2/Matrix Calculator/logo/CS CALC.png");
-    const int logoSize = 90;
-    ui->label_logo->setFixedSize(190, logoSize);
-    ui->label_logo->setPixmap(pix.scaled(80, 80));
+    QPixmap pix(":/logo/resource/CS CALC.png");
+    const int sideLength = ui->label_logo->width();
+    QPixmap scaled = pix.scaled(sideLength, sideLength, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    ui->label_logo->setPixmap(scaled);
 
     setWindowTitle("Matrix Calculator");
 
@@ -384,6 +384,7 @@ void matrixCalcu::showError(const QString message)
     msgBox.setWindowTitle("Matrix Calculator");
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setText(message);
+    msgBox.setWindowIcon(QIcon(":/logo/resource/CS CALC.png"));
     msgBox.exec();
 }
 
@@ -467,11 +468,13 @@ void matrixCalcu::resultMatrix_2()
              if (validator) {
                 qDebug() << "0.8";
                  if (ui->button_ref->isChecked() || ui->button_rref->isChecked()){
+                    ui->label_matrixResult_size->setText(ui->lineEdit_matrixA_rows_2->text() + " x " + ui->lineEdit_matrixA_cols_2->text());
                     remove_existingMatrix(ui->gridLayout_3);
                     RowEchelon();
 
                  }
                  if (ui->button_inverse->isChecked()){
+                     ui->label_matrixResult_size->setText(ui->lineEdit_matrixA_rows_2->text() + " x " + ui->lineEdit_matrixA_cols_2->text());
                      remove_existingMatrix(ui->gridLayout_3);
                      inverse();
                  }
@@ -983,7 +986,9 @@ void matrixCalcu::RowEchelon()
     }
 
     for (vector<Position>::iterator pos = pivot_positions.begin(); pos != pivot_positions.end(); pos++) {
-
+        if (pos->col == matrixA_cols - 1) {
+            break; // Kani ra and na-add, ga check if last column na ba and mag stop siya meaning inconsistent
+        }
         if (matrixA[pos->row][pos->col] != 1.0) {
             qDebug() << "scaling row " << pos->row << " by " << 1.0 / matrixA[pos->row][pos->col] << Qt::endl;
             row_scale(matrixA.begin() + pos->row, 1.0 / matrixA[pos->row][pos->col]);
