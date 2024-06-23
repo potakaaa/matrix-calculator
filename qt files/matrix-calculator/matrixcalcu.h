@@ -60,6 +60,8 @@ public slots:
     void resultMatrix();
     void resultMatrix_2();
 
+    QString reverseString(QString txt, int size, QString& rev);
+
 
 
 

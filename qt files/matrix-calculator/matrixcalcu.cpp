@@ -520,7 +520,9 @@ void matrixCalcu::resultMatrix_2()
 
                      ui->gridLayout_3->addWidget(ui->label_matrixResult, 0, 0, 1, answer_rows);
                      ui->gridLayout_3->addWidget(ui->label_matrixResult_size, answer_cols + 1, 0, 1, answer_rows);
-                     ui->label_matrixResult_size->setText(ui->lineEdit_matrixA_cols_2->text() + " x " + ui->lineEdit_matrixA_rows_2->text());
+                     QString txt = ui->lineEdit_matrixA_rows_2->text() + " x " + ui->lineEdit_matrixA_cols_2->text();
+                     QString rev = ""; int txt_size = txt.length(); QString f = reverseString(txt, txt_size, rev);
+                     ui->label_matrixResult_size->setText(f);
 
                      qDebug() << "0.99";
                      qDebug() << "Matrix A Rows: " << answer_cols << " Matrix A Cols: " << answer_rows;
@@ -1031,6 +1033,19 @@ void matrixCalcu::RowEchelon()
     }
 
     qDebug() << "4";
+}
+
+QString matrixCalcu::reverseString(QString txt, int size, QString& rev)
+{
+    qDebug() << "a";
+    if (size == 0) {
+        return rev;
+    }
+    qDebug() << "a1";
+    rev += txt[size-1];
+    qDebug() << "a2";
+    return reverseString(txt, size-1, rev);
+
 }
 
 
